@@ -1,0 +1,1 @@
+It contains different api made using sails js and It also contains bcrypt for hashing and jsonwebtoken(authorization).
