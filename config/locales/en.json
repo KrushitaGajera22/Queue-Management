@@ -1,4 +1,21 @@
 {
   "Welcome": "Welcome",
-  "A brand new app.": "A brand new app."
+  "A brand new app.": "A brand new app.",
+  "NEW_PLACE": "New Place Added!!",
+  "WENT_WRONG": "Something Went wrong!!!",
+  "ALREADY_IN_USE": "Name or ticketSeries already in use",
+  "PLACE_NOT": "Place not found",
+  "PLACE_UPDATE": "Place updated!",
+  "PLACE_DELETE": "Place deleted",
+  "NEW_TICKET": "New Ticket Created!!!",
+  "TICKET_IN_USE": "ticketNumber already in use",
+  "SIGN_UP": "Signed Up!!",
+  "EMAIL_IN_USE": "Email already in use",
+  "PASS_VALIDATE": "Enter password of atleast 6 characters",
+  "USER_NOT": "User not Found",
+  "LOG_IN": "Logged in!!",
+  "INVALID": "Invalid Details",
+  "LOG_OUT": "User Logout!!",
+  "USER_UPDATE": "user updated",
+  "UNAUTHORIZED": "Unauthorized: provide appropriate token"
 }

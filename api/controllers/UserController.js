@@ -6,6 +6,7 @@
  */
 
 const Constants = sails.config.constants;
+const ResponseCodes = Constants.ResponseCodes;
 
 module.exports = {
     // for registering new user
@@ -24,14 +25,31 @@ module.exports = {
                     email: req.body.email,
                     password: hash.hash,
                 })
-                return res.status(201).send({ message: 'Signed Up!!' })
+                    .then(() => {
+                        return res.status(ResponseCodes.CREATED).send({
+                            status: ResponseCodes.CREATED,
+                            message: req.i18n.__("SIGN_UP") 
+                        })
+                    })
+                    .catch({ code: 'E_UNIQUE' }, (err) => {
+                        return res.status(ResponseCodes.CONFLICT).send({
+                            status: ResponseCodes.CONFLICT,
+                            message: req.i18n.__("EMAIL_IN_USE"),
+                          });
+                    })
             } else {
-                return res.status(404).send({ message: 'Enter password of atleast 6 characters' })
+                return res.status(ResponseCodes.NOT_FOUND).send({
+                    status: ResponseCodes.NOT_FOUND,
+                    message: req.i18n.__("PASS_VALIDATE")
+                })
             }
 
         } catch (error) {
             console.log(error);
-            res.status(500).send({ error: error });
+            return res.serverError({
+                status: ResponseCodes.SERVER_ERROR,
+                error: req.i18n.__("WENT_WRONG"),
+              });
         }
     },
 
@@ -43,12 +61,18 @@ module.exports = {
             await User.find({ email: req.body.email })
                 .then(async (user) => {
                     if (!user) {
-                        return res.status(404).send({ message: 'User not Found' })
+                        return res.status(ResponseCodes.NOT_FOUND).send({
+                            status: ResponseCodes.NOT_FOUND,
+                            message: req.i18n.__("USER_NOT")
+                        })
                     }
                     // comparing password using bcrypt compare method
                     await Constants.bcrypt.compare(password, user[0].password, async (err, result) => {
                         if (err) {
-                            return res.status(401).send({ error: err });
+                            return res.badRequest({
+                                status: ResponseCodes.BAD_REQUEST, 
+                                error: req.i18n.__("WENT_WRONG") 
+                            });
                         }
                         if (result) {
                             // generating token using helper generateToken
@@ -64,14 +88,24 @@ module.exports = {
                             res.cookie('Jwt', token.token, {
                                 httpOnly: true
                             })
-                            return res.status(200).send({ message: 'Logged in!!', token: token.token, user: user })
+                            return res.ok({
+                                status: ResponseCodes.OK, 
+                                message: req.i18n.__("LOG_IN"), 
+                                token: token.token, 
+                                data: user })
                         }
-                        res.status(500).send({ message: 'Invalid Details' });
+                        return res.serverError({
+                            status: ResponseCodes.SERVER_ERROR,
+                            error: req.i18n.__("INVALID"),
+                          });
                     })
                 })
         } catch (error) {
             console.log(error);
-            return res.status(500).send({ error: error });
+            return res.serverError({
+                status: ResponseCodes.SERVER_ERROR,
+                error: req.i18n.__("WENT_WRONG"),
+              });
         }
     },
 
@@ -84,15 +118,24 @@ module.exports = {
                 .then((user) => {
                     // if user is not logged in
                     if (!user) {
-                        return res.status(404).send({ message: 'User not found' })
+                        return res.status(ResponseCodes.NOT_FOUND).send({
+                            status: ResponseCodes.NOT_FOUND,
+                            message: req.i18n.__("USER_NOT")
+                        })
                     }
                     //clearing cookies 
                     res.clearCookie('Jwt');
-                    res.status(200).send({ message: 'User Logout!!' })
+                    return res.ok({
+                        status: ResponseCodes.OK, 
+                        message: req.i18n.__("LOG_OUT")
+                    })
                 });
         } catch (error) {
-            res.send({ error: error });
             console.log(error);
+            return res.serverError({
+                status: ResponseCodes.SERVER_ERROR,
+                error: req.i18n.__("WENT_WRONG"),
+              });
         }
     },
 
@@ -104,10 +147,16 @@ module.exports = {
             // updating user name with its id
             await User.update({ id: id }, { name: name })
                 .then(() => {
-                    res.status(200).send({ message: "user updated" });
+                    res.ok({
+                        status: ResponseCodes.OK, 
+                        message: req.i18n.__("USER_UPDATE")
+                    });
                 });
         } catch (error) {
-            res.status(500).send({ error: error });
+            return res.serverError({
+                status: ResponseCodes.SERVER_ERROR,
+                error: req.i18n.__("WENT_WRONG"),
+              });
         }
     }
 

@@ -1,4 +1,5 @@
 const Constants = sails.config.constants;
+const ResponseCodes = Constants.ResponseCodes;
 
 module.exports = async (req, res, next) => {
     try {
@@ -10,7 +11,10 @@ module.exports = async (req, res, next) => {
             else {
                 // checking if id is verified or not
                 if (decoded.id !== (req.params.id || req.body.user)) {
-                    return res.status(401).send({ message: 'Unauthorized' });
+                    return res.status(ResponseCodes.UNAUTHORIZED).send({
+                        status: ResponseCodes.UNAUTHORIZED,
+                        message: req.i18n.__("UNAUTHORIZED")
+                    });
                 }
                 else {
                     next();
@@ -19,6 +23,9 @@ module.exports = async (req, res, next) => {
         });
     } catch (error) {
         console.log(error);
-        return res.status(401).send({ message: 'Unauthorized' })
+        return res.status(ResponseCodes.UNAUTHORIZED).send({
+            status: ResponseCodes.UNAUTHORIZED,
+            message: req.i18n.__("UNAUTHORIZED")
+        });
     }
 }
